@@ -55,12 +55,18 @@ def _show_adjrib_callback(reactor, service, last, route_type, advertised, rib_na
                 # log something about this drop?
                 continue
 
-            routes.append(
-                {
-                    'prefix': str(change.nlri.cidr.prefix()),
-                    'family': str(change.nlri.family()).strip('()').replace(',', ''),
-                },
-            )
+            route = {
+                'family': str(change.nlri.family()).strip('()').replace(',', ''),
+            }
+            # Prefix-based NLRI (INET, Flow, etc.) expose a cidr attribute.
+            # Non-prefix NLRI (such as SR-Policy) do not, so we fall back to str(nlri).
+            nlri = change.nlri
+            if hasattr(nlri, 'cidr'):
+                route['prefix'] = str(nlri.cidr.prefix())
+            else:
+                route['nlri'] = str(nlri)
+
+            routes.append(route)
 
             for line in json.dumps(jason).split('\n'):
                 reactor.processes.write(service, line)

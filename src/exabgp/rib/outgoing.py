@@ -106,7 +106,8 @@ class OutgoingRIB(Cache):
         for change in new:
             indexed.pop(change.index(), None)
 
-        for change in self.cached_changes(self.families):
+        cached = list(self.cached_changes(self.families))
+        for change in cached:
             self.add_to_rib(change, True)
 
         for index in list(indexed):

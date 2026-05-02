@@ -61,8 +61,10 @@ class Cache:
     def update_cache(self, change):
         if not self.cache:
             return
+
         family = change.nlri.family().afi_safi()
         index = change.index()
+
         if change.nlri.action == Action.ANNOUNCE:
             self._seen.setdefault(family, {})[index] = change
         elif family in self._seen:

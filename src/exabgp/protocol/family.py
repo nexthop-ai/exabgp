@@ -112,9 +112,30 @@ class AFI(Resource):
     @staticmethod
     def implemented_safi(afi):
         if afi == 'ipv4':
-            return ['unicast', 'multicast', 'nlri-mpls', 'mcast-vpnmpls-vpn', 'flow', 'flow-vpn', 'mup']
+            return [
+                'unicast',
+                'multicast',
+                'nlri-mpls',
+                'labeled-unicast',
+                'mcast-vpn',
+                'mpls-vpn',
+                'flow',
+                'flow-vpn',
+                'mup',
+                'sr-policy',
+            ]
         if afi == 'ipv6':
-            return ['unicast', 'mpls-vpn', 'mcast-vpn', 'flow', 'flow-vpn', 'mup']
+            return [
+                'unicast',
+                'nlri-mpls',
+                'labeled-unicast',
+                'mpls-vpn',
+                'mcast-vpn',
+                'flow',
+                'flow-vpn',
+                'mup',
+                'sr-policy',
+            ]
         if afi == 'l2vpn':
             return ['vpls', 'evpn']
         if afi == 'bgp-ls':
@@ -143,12 +164,14 @@ class _SAFI(int):
     EVPN = 70  # [draft-ietf-l2vpn-evpn]
     BGPLS = 71  # [RFC7752]
     BGPLS_VPN = 72  # [RFC7752]
+    SR_POLICY = 73  # [RFC9830]
     MUP = 85  # [draft-mpmz-bess-mup-safi]
     MPLS_VPN = 128  # [RFC4364]
     MCAST_VPN = 5  # [RFC6514]
     RTC = 132  # [RFC4684]
     FLOW_IP = 133  # [RFC5575]
     FLOW_VPN = 134  # [RFC5575]
+    # Unused/deprecated SAFI values (kept for reference):
     # deprecated = 3            # [RFC4760]
     # mcast_vpn = 5             # [draft-ietf-l3vpn-2547bis-mcast-bgp] (TEMPORARY - Expires 2008-06-19)
     # pseudowire = 6            # [draft-ietf-pwe3-dynamic-ms-pw] (TEMPORARY - Expires 2008-08-23)
@@ -173,6 +196,7 @@ class _SAFI(int):
         EVPN: 'evpn',
         BGPLS: 'bgp-ls',
         BGPLS_VPN: 'bgp-ls-vpn',
+        SR_POLICY: 'sr-policy',
         MUP: 'mup',
         MPLS_VPN: 'mpls-vpn',
         MCAST_VPN: 'mcast-vpn',
@@ -214,6 +238,7 @@ class SAFI(Resource):
     evpn = _SAFI(_SAFI.EVPN)
     bgp_ls = _SAFI(_SAFI.BGPLS)
     bgp_ls_vpn = _SAFI(_SAFI.BGPLS_VPN)
+    sr_policy = _SAFI(_SAFI.SR_POLICY)
     mup = _SAFI(_SAFI.MUP)
     mpls_vpn = _SAFI(_SAFI.MPLS_VPN)
     mcast_vpn = _SAFI(_SAFI.MCAST_VPN)
@@ -230,6 +255,7 @@ class SAFI(Resource):
         evpn.pack(): evpn,
         bgp_ls.pack(): bgp_ls,
         bgp_ls_vpn.pack(): bgp_ls_vpn,
+        sr_policy.pack(): sr_policy,
         mup.pack(): mup,
         mpls_vpn.pack(): mpls_vpn,
         mcast_vpn.pack(): mcast_vpn,
@@ -248,6 +274,7 @@ class SAFI(Resource):
             'evpn': evpn,
             'bgp-ls': bgp_ls,
             'bgp-ls-vpn': bgp_ls_vpn,
+            'sr-policy': sr_policy,
             'mup': mup,
             'mpls-vpn': mpls_vpn,
             'mcast-vpn': mcast_vpn,
@@ -293,6 +320,8 @@ class Family:
         (AFI.ipv4, SAFI.flow_ip): ((0, 4), 0),
         (AFI.ipv4, SAFI.flow_vpn): ((0, 4), 0),
         (AFI.ipv4, SAFI.rtc): ((4, 16), 0),
+        (AFI.ipv4, SAFI.sr_policy): ((4,), 0),
+        (AFI.ipv6, SAFI.sr_policy): ((16,), 0),
         (AFI.ipv6, SAFI.unicast): ((16, 32), 0),
         (AFI.ipv6, SAFI.nlri_mpls): ((16, 32), 0),
         (AFI.ipv6, SAFI.mup): ((4, 16), 0),

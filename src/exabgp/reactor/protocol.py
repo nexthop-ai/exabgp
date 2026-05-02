@@ -421,6 +421,7 @@ class Protocol:
                 for boolean in self.send(message):
                     # boolean is a transient network error we already announced
                     yield _NOP
+
         if number:
             log.debug(lambda: '>> %d UPDATE(s)' % number, self.connection.session())
         yield _UPDATE

@@ -247,9 +247,11 @@ class ParseNeighbor(Section):
         # NOTE: this may modify change but does not matter as want to modified
 
         neighbor.changes = []
-        for change in self.scope.pop_routes():
+        routes_from_scope = list(self.scope.pop_routes())
+        for change in routes_from_scope:
             # remove_self may well have side effects on change
-            neighbor.changes.append(neighbor.remove_self(change))
+            processed = neighbor.remove_self(change)
+            neighbor.changes.append(processed)
 
         # old format
         for section in ('static', 'l2vpn', 'flow'):

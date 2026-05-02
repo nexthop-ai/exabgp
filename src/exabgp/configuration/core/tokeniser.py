@@ -44,6 +44,11 @@ class Iterator:
             return ''
 
     def peek(self):
+        # If we've already peeked ahead, return the buffered token
+        if self.next:
+            return self.next[0]
+
+        # Otherwise, peek the next token from the generator
         try:
             peaked = next(self.generator)
             self.next.append(peaked)
@@ -145,7 +150,7 @@ class Tokeniser:
                         self.index_line += 1
                         current = current.rstrip()
                         if current.endswith('\\'):
-                            line += current
+                            line += current[:-1]  # Remove trailing backslash for line continuation
                             continue
                         if line:
                             yield line + current

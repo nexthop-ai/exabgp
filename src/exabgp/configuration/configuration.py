@@ -34,6 +34,8 @@ from exabgp.configuration.announce import AnnounceIPv6
 from exabgp.configuration.announce import AnnounceL2VPN
 from exabgp.configuration.static import ParseStatic
 from exabgp.configuration.static import ParseStaticRoute
+from exabgp.configuration.static import ParseStaticSRPolicyRoute
+from exabgp.configuration.static import ParseSegmentList
 from exabgp.configuration.flow import ParseFlow
 from exabgp.configuration.flow import ParseFlowRoute
 from exabgp.configuration.flow import ParseFlowThen
@@ -54,6 +56,7 @@ from exabgp.configuration.announce.mvpn import AnnounceMVPN  # noqa: F401,E261,E
 from exabgp.configuration.announce.flow import AnnounceFlow  # noqa: F401,E261,E501
 from exabgp.configuration.announce.vpls import AnnounceVPLS  # noqa: F401,E261,E501
 from exabgp.configuration.announce.mup import AnnounceMup  # noqa: F401,E261,E501
+from exabgp.configuration.announce.sr_policy import sr_policy_ipv4, sr_policy_ipv6  # noqa: F401,E261,E501
 
 
 class _Configuration:
@@ -149,6 +152,8 @@ class Configuration(_Configuration):
         self.api_receive = ParseReceive(*params)
         self.static = ParseStatic(*params)
         self.static_route = ParseStaticRoute(*params)
+        self.static_sr_policy_route = ParseStaticSRPolicyRoute(*params)
+        self.static_segment_list = ParseSegmentList(*params)
         self.announce = SectionAnnounce(*params)
         self.announce_ipv4 = AnnounceIPv4(*params)
         self.announce_ipv6 = AnnounceIPv6(*params)
@@ -267,12 +272,32 @@ class Configuration(_Configuration):
             },
             self.announce_ipv4.name: {
                 'class': self.announce_ipv4,
-                'commands': ['unicast', 'multicast', 'nlri-mpls', 'mpls-vpn', 'mcast-vpn', 'flow', 'flow-vpn', 'mup'],
+                'commands': [
+                    'unicast',
+                    'multicast',
+                    'nlri-mpls',
+                    'mpls-vpn',
+                    'mcast-vpn',
+                    'flow',
+                    'flow-vpn',
+                    'mup',
+                    'sr-policy',
+                ],
                 'sections': {},
             },
             self.announce_ipv6.name: {
                 'class': self.announce_ipv6,
-                'commands': ['unicast', 'multicast', 'nlri-mpls', 'mpls-vpn', 'mcast-vpn', 'flow', 'flow-vpn', 'mup'],
+                'commands': [
+                    'unicast',
+                    'multicast',
+                    'nlri-mpls',
+                    'mpls-vpn',
+                    'mcast-vpn',
+                    'flow',
+                    'flow-vpn',
+                    'mup',
+                    'sr-policy',
+                ],
                 'sections': {},
             },
             self.announce_l2vpn.name: {
@@ -284,14 +309,27 @@ class Configuration(_Configuration):
             },
             self.static.name: {
                 'class': self.static,
-                'commands': ['route', 'attributes'],
+                'commands': ['route', 'attributes', 'sr-policy'],
                 'sections': {
                     'route': self.static_route.name,
+                    'sr-policy': self.static_sr_policy_route.name,
                 },
             },
             self.static_route.name: {
                 'class': self.static_route,
                 'commands': self.static_route.known.keys(),
+                'sections': {},
+            },
+            self.static_sr_policy_route.name: {
+                'class': self.static_sr_policy_route,
+                'commands': self.static_sr_policy_route.known.keys(),
+                'sections': {
+                    'segment-list': self.static_segment_list.name,
+                },
+            },
+            self.static_segment_list.name: {
+                'class': self.static_segment_list,
+                'commands': self.static_segment_list.known.keys(),
                 'sections': {},
             },
             self.flow.name: {

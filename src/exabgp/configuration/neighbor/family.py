@@ -47,6 +47,7 @@ class ParseFamily(Section):
             'flow': (AFI.ipv4, SAFI.flow_ip),
             'flow-vpn': (AFI.ipv4, SAFI.flow_vpn),
             'mup': (AFI.ipv4, SAFI.mup),
+            'sr-policy': (AFI.ipv4, SAFI.sr_policy),
         },
         'ipv6': {
             'unicast': (AFI.ipv6, SAFI.unicast),
@@ -54,6 +55,7 @@ class ParseFamily(Section):
             'mpls-vpn': (AFI.ipv6, SAFI.mpls_vpn),
             'mcast-vpn': (AFI.ipv6, SAFI.mcast_vpn),
             'mup': (AFI.ipv6, SAFI.mup),
+            'sr-policy': (AFI.ipv6, SAFI.sr_policy),
             'flow': (AFI.ipv6, SAFI.flow_ip),
             'flow-vpn': (AFI.ipv6, SAFI.flow_vpn),
         },

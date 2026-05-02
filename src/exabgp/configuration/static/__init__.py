@@ -9,6 +9,11 @@ from __future__ import annotations
 
 from exabgp.configuration.static.route import ParseStaticRoute
 from exabgp.configuration.static.parser import prefix
+from exabgp.configuration.static.sr_policy_route import (
+    sr_policy,
+    ParseStaticSRPolicyRoute as ParseStaticSRPolicyRoute,
+    ParseSegmentList as ParseSegmentList,
+)
 
 from exabgp.configuration.announce.path import AnnouncePath
 from exabgp.configuration.announce.label import AnnounceLabel
@@ -189,3 +194,12 @@ def attributes(tokeniser):
         changes.append(new)
 
     return changes
+
+
+@ParseStatic.register('sr-policy', 'append-route')
+def static_sr_policy(tokeniser):
+    """Handler for SR-Policy routes in static section.
+
+    Delegates to the sr_policy parser from sr_policy_route module.
+    """
+    return sr_policy(tokeniser)

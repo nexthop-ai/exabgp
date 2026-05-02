@@ -195,9 +195,14 @@ class Record:
 
     @classmethod
     def next_nick(cls):
-        nick = cls._listing[cls._index]
+        idx = cls._index
         cls._index += 1
-        return nick
+        n = len(cls._listing)
+        if idx < n:
+            return cls._listing[idx]
+        # overflow: two-char nick (listing[outer] + listing[inner])
+        idx -= n
+        return cls._listing[idx // n % n] + cls._listing[idx % n]
 
     def skip(self):
         self.state = State.SKIP
@@ -373,7 +378,15 @@ class EncodingTests(Tests):
             test = self.new(name)
             with open(filename, 'r') as reader:
                 content = reader.readline()
-            test.conf['confs'] = [Path.etc(_) for _ in content.split()]
+            # Skip CI files whose first line isn't a plain conf filename
+            # (e.g. 6.x-format files that start with "option:file:")
+            conf_names = content.split()
+            if not conf_names or any(':' in c for c in conf_names):
+                del self._by_nick[test.nick]
+                self._ordered.remove(test.nick)
+                self.klass._index -= 1
+                continue
+            test.conf['confs'] = [Path.etc(_) for _ in conf_names]
             test.conf['ci'] = Path.ci(name, 'ci')
             test.conf['msg'] = Path.ci(name, 'msg')
             test.conf['port'] = Port.get()
